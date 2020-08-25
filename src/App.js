@@ -1,34 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
-import DomPractice from './components/DomPractice';
-import StatePractice from './components/StatePractice';
-import ConditionalReturnIfElse from './components/ConditionalReturnIfElse';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
-import ConditionalReturnElementVarriable from './components/ConditionalReturnElementVarriable';
-import RefreshNow from './components/RefreshNow';
-import DomRenderHydrade from './components/DomRenderHydrade';
+import Country from './components/Country/Country';
+
 
 
 function App() {
+  const [countries,setCountries] = useState([])
+
+  useEffect(()=>{
+    fetch('https://restcountries.eu/rest/v2/all')
+    .then(res=>res.json())
+    .then(data=> setCountries(data))
+    .catch(error=> console.log(error))
+  },[])
+
+const [pickedCoun, setPickedCoun] = useState([])
+const addedCountries = (country)=>{
+        const newPicked = [...pickedCoun, country]
+        setPickedCoun(newPicked)
+}
+const totalPopulation = pickedCoun.reduce((initial, country)=> initial+country.population,0)
+
+
   return (   
-          <div>
-              <h5 className='text-center'>Change DOM using findDOMNode</h5>
-              <DomPractice></DomPractice>
-              <hr></hr>
-              <h5 className='text-center'>Change Container Using DOM render() or hydrade()</h5>
-              <DomRenderHydrade></DomRenderHydrade>
-              <hr></hr>
-              <h5 className='text-center'>Automaitce Force Update this.forceUpdate()</h5>
-              <RefreshNow></RefreshNow>
-              <hr></hr>
-              <h5 className='text-center'>Conditional Return inside return block</h5>
-              <ConditionalReturnElementVarriable></ConditionalReturnElementVarriable>
-              <hr></hr>
-              <h5 className='text-center'>Conditional Return Using State value Check</h5>
-              <ConditionalReturnIfElse></ConditionalReturnIfElse>
-              <hr></hr>
-              <h5 className='text-center'>State value set and Update</h5>
-              <StatePractice></StatePractice>
+          <div className='container'>
+                <div className="jumbotron text-center">
+                <h1 className='display-3'>Total Countries : {countries.length}</h1>
+                <h4 className='m-0 mb-2'>Selected Countries: {pickedCoun.length}</h4>
+                <h4 className='m-0'>Added Population: {totalPopulation}</h4>
+                </div>
+               {countries.map(conutry=><Country addedCountries={addedCountries} key={conutry.alpha3Code} country={conutry}></Country>)}
           </div>
    )
 }
